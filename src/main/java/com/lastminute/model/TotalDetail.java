@@ -9,7 +9,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class TotalDetail {
 
-	private BigDecimal taxes;
-	private BigDecimal total;
+	private BigDecimal totalTaxes;
+	private BigDecimal totalPrice;
 
 }

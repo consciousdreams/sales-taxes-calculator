@@ -13,6 +13,7 @@ public class SalesTaxesCalculator {
 	private static final BigDecimal IMPORT_TAX_RATE = BigDecimal.valueOf(0.05);
 	private static final BigDecimal ROUND_INCREMENT = BigDecimal.valueOf(0.05);
 	private static final String[] NOT_TAXABLE_PRODUCTS = { "book", "chocolate", "headache" };
+	private static final String IMPORTED_PRODUCT = "imported";
 
 	/**
 	 * This method retrieves the total amount and taxes.
@@ -30,40 +31,42 @@ public class SalesTaxesCalculator {
 		}
 
 		// Initialize fields
-		BigDecimal taxes = BigDecimal.ZERO;
-		BigDecimal total = BigDecimal.ZERO;
+		BigDecimal totalTaxes = BigDecimal.ZERO;
+		BigDecimal totalPrice = BigDecimal.ZERO;
 
 		for (Product product : productList) {
 
 			// check if a product is valid (not null check)
 			if (!isValid(product)) {
-
 				BigDecimal productTaxes = BigDecimal.ZERO;
 
-				// add normal tax
+				// calculate normal tax
 				if (isTaxable(product.getName())) {
 					productTaxes = productTaxes.add(product.getPrice().multiply(GENERAL_TAX_RATE));
 				}
 
-				// add importation taxes
+				// calculate importation taxes
 				if (isImported(product.getName())) {
 					productTaxes = productTaxes.add(product.getPrice().multiply(IMPORT_TAX_RATE));
 				}
 
-				// add rounded taxes to the total taxes amount
-				taxes = taxes.add(round(productTaxes));
+				// round taxes
+				productTaxes = round(productTaxes);
 
-				// add price to the total amount (not taxed yet)
-				total = total.add(product.getPrice());
+				// calculate single price with taxes
+				product.setPriceWithTaxes(productTaxes.add(product.getPrice()));
+
+				// add taxes to the total taxes amount
+				totalTaxes = totalTaxes.add(productTaxes);
+
+				// add single product price with taxes to the total price
+				totalPrice = totalPrice.add(product.getPriceWithTaxes());
 			}
 
 		}
 
-		// add taxes to find the total amount
-		total = total.add(taxes);
-
 		// return the total detail
-		return new TotalDetail(taxes, total);
+		return new TotalDetail(totalTaxes, totalPrice);
 	}
 
 	private BigDecimal round(BigDecimal value) {
@@ -71,7 +74,7 @@ public class SalesTaxesCalculator {
 	}
 
 	private boolean isImported(String name) {
-		return name.contains("imported");
+		return name.contains(IMPORTED_PRODUCT);
 	}
 
 	private boolean isTaxable(String name) {
