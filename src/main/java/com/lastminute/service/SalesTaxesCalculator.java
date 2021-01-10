@@ -78,14 +78,12 @@ public class SalesTaxesCalculator {
 	}
 
 	private boolean isTaxable(String name) {
-		boolean taxable = true;
 		for (String notTaxableProduct : NOT_TAXABLE_PRODUCTS) {
 			if (name.contains(notTaxableProduct)) {
-				taxable = false;
-				break;
+				return false;
 			}
 		}
-		return taxable;
+		return true;
 	}
 
 	private boolean isValid(Product product) {
