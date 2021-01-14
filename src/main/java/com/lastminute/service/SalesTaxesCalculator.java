@@ -3,6 +3,7 @@ package com.lastminute.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.stream.Stream;
 
 import com.lastminute.model.Product;
 import com.lastminute.model.TotalDetail;
@@ -77,13 +78,15 @@ public class SalesTaxesCalculator {
 		return name.contains(IMPORTED_PRODUCT);
 	}
 
+	/**
+	 * If the product name contains a NOT_TAXABLE_PRODUCTS word, the product is not
+	 * taxable.
+	 *
+	 * @param String the name of the product
+	 * @return boolean true if the product is taxable
+	 */
 	private boolean isTaxable(String name) {
-		for (String notTaxableProduct : NOT_TAXABLE_PRODUCTS) {
-			if (name.contains(notTaxableProduct)) {
-				return false;
-			}
-		}
-		return true;
+		return !Stream.of(NOT_TAXABLE_PRODUCTS).anyMatch(notTaxableProduct -> name.contains(notTaxableProduct));
 	}
 
 	private boolean isValid(Product product) {
